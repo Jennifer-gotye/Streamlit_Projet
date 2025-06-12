@@ -1,0 +1,19 @@
+streamlit
+pandas
+numpy
+matplotlib.pyploT
+import seaborn as sns
+plotly.graph_objectS
+plotly.express
+PIL
+pycountry
+sklearn.model_selection
+sklearn.preprocessing
+sklearn.metrics
+import base64
+import joblib
+statsmodels.tsa.arima.model
+statsmodels.tsa.statespace.sarimax
+plotly.io
+mpl_toolkits.basemap
+matplotlib.colors
