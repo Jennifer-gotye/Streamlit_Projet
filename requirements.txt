@@ -9,4 +9,4 @@ pycountry
 scikit-learn
 joblib
 statsmodels
-basemap
+basemap==1.2.2
