@@ -24,15 +24,16 @@ from matplotlib.colors import Normalize
 ######################## Import des dataframes NASA et OWID, préprocessing et SARIMAX dans un cache #############################
 @st.cache_data
 def load_data():
-    North_hemisphere = pd.read_csv(r'C:\Users\d58671\OneDrive - EDF\Documents\NASA\NH.Ts+dSST.csv', header = 1, na_values = ['***'])
-    South_hemisphere = pd.read_csv(r'C:\Users\d58671\OneDrive - EDF\Documents\NASA\SH.Ts+dSST.csv', header = 1, na_values = ['***'])
-    Global=pd.read_csv(r'C:\Users\d58671\OneDrive - EDF\Documents\NASA\GLB.Ts+dSST.csv', header = 1, na_values = ['***'])
-    Zone=pd.read_csv(r'C:\Users\d58671\OneDrive - EDF\Documents\NASA\ZonAnn.Ts+dSST.csv', index_col = 'Year')
-    df_owid=pd.read_csv(r'C:\Users\d58671\OneDrive - EDF\Documents\owid-co2-data.csv')
+    North_hemisphere = pd.read_csv(r'NH.Ts+dSST.csv', header = 1, na_values = ['***'])
+    South_hemisphere = pd.read_csv(r'SH.Ts+dSST.csv', header = 1, na_values = ['***'])
+    Global=pd.read_csv(r'GLB.Ts+dSST.csv', header = 1, na_values = ['***'])
+    Zone=pd.read_csv(r'ZonAnn.Ts+dSST.csv', index_col = 'Year')
+    df_owid=pd.read_csv(r'owid-co2-data.csv')
      ### NASA ###
+    Global[['D-N', 'DJF']] = Global[['D-N', 'DJF']].apply(pd.to_numeric, errors='coerce')
     South_hemisphere[['D-N', 'DJF']] = South_hemisphere[['D-N', 'DJF']].apply(pd.to_numeric, errors='coerce')
     North_hemisphere[['D-N', 'DJF']] = North_hemisphere[['D-N', 'DJF']].apply(pd.to_numeric, errors='coerce')
-    Global_DJF = round(((Global.loc[Global['Year']==1880, 'Jan'] + Global.loc[Global['Year']==1880, 'Feb']) / 2),2)
+    Global_DJF = round(((Global.loc[Global['Year'] == 1880, 'Jan'].values[0] + Global.loc[Global['Year'] == 1880, 'Feb'].values[0]) / 2), 2)
     North_hemisphere_DJF = round(((North_hemisphere.loc[North_hemisphere['Year'] == 1880, 'Jan'].values[0] + North_hemisphere.loc[North_hemisphere['Year'] == 1880, 'Feb'].values[0]) / 2), 2)
     South_hemisphere_DJF = round(((South_hemisphere.loc[South_hemisphere['Year'] == 1880, 'Jan'].values[0] +  South_hemisphere.loc[South_hemisphere['Year'] == 1880, 'Feb'].values[0]) / 2), 2)
     Global.fillna(Global_DJF, inplace = True)
@@ -132,7 +133,7 @@ def set_global_style():
     pio.templates.default = "custom"
 set_global_style()
 #  Image de bandeau
-image_path= r'C:/Users/d58671/Pictures/bandeau streamlit_2.png'
+image_path= r'bandeau streamlit_2.png'
 image_base64 = get_base64_im(image_path)
 st.markdown(
     f"""
@@ -145,7 +146,7 @@ st.markdown(
     """,
     unsafe_allow_html=True)
 # Affichage du contenu de la sidebar
-image_path = r'C:\Users\d58671\Pictures\planète.jpg'
+image_path = r'planète.jpg'
 image_base64 = get_base64_im(image_path)
 with st.sidebar:
    st.markdown(
@@ -157,7 +158,7 @@ with st.sidebar:
    st.header("Menu")
    pages=["Introduction et exploration des datasets", "DataVisualisation", "Modélisation", "Conclusion"]
    page=st.sidebar.radio("Allez vers", pages)
-   image_path = r'C:\Users\d58671\Pictures\datascientest.jpg'
+   image_path = r'datascientest.jpg'
    image_base64 = get_base64_im(image_path)
    st.markdown(f"""
         <div class="sidebar-footer">
@@ -179,7 +180,7 @@ if page == pages[0] :
     if option_df == 'NASA: Datasets par hémisphère et Global':
         col1, col2 = st.columns([1, 4])  # Largeur relative : 4/5 pour le texte, 1/5 pour l'image
         with col1:
-         image = Image.open(r'C:\Users\d58671\Pictures\nasa.png')  
+         image = Image.open(r'nasa.png')  
          st.image(image, width=100)  
         with col2:
           st.write("### Exploration des datasets de la NASA") 
@@ -221,7 +222,7 @@ glb = pd.concat([North_hemisphere, South_hemisphere, Global])
     elif option_df == 'NASA: Dataset par zones':
         col5, col6 = st.columns([1, 4])
         with col5:
-         image = Image.open(r'C:\Users\d58671\Pictures\nasa.png')  
+         image = Image.open(r'nasa.png')  
          st.image(image, width=100)  
         with col6:
           st.write("### Exploration des datasets de la NASA")  
@@ -236,7 +237,7 @@ glb = pd.concat([North_hemisphere, South_hemisphere, Global])
     elif option_df == 'OWID: Dataset':
         col7, col8 = st.columns([1, 4])
         with col7:
-          image = Image.open(r'C:\Users\d58671\Pictures\OWID.png')  
+          image = Image.open(r'OWID.png')  
           st.image(image, width=100) 
         with col8:
           st.write("### Exploration du dataset OWID")  
@@ -288,9 +289,9 @@ if page == pages[1] :
    # GRAPHIQUE 1 : Évolution des températures
     with tab1:
       fig, ax = plt.subplots(figsize=(12, 5))
-      ax.plot(Global.index, Global['J-D'], label="Global")
-      ax.plot(North_hemisphere.index, North_hemisphere['J-D'], label="Hémisphère Nord")
-      ax.plot(South_hemisphere.index, South_hemisphere['J-D'], label="Hémisphère Sud")
+      ax.plot(Global['Year'], Global['J-D'], label="Global")
+      ax.plot(North_hemisphere['Year'], North_hemisphere['J-D'], label="Hémisphère Nord")
+      ax.plot(South_hemisphere['Year'], South_hemisphere['J-D'], label="Hémisphère Sud")
       ax.set_title("Variation annuelle des températures")
       ax.set_xlabel("Années")
       ax.set_ylabel("Anomalie de température (°C)")
@@ -595,7 +596,7 @@ if page == pages[2] :
   if option_ml == 'Machine learning "classique"':
     st.write("### Machine learning classique")
     with st.expander("📈 Régression Linéaire", expanded=False):
-        model = joblib.load(r"C:\Users\d58671\Documents\Supports de formation\Formation Data_analyst\Projet données terrestres\model.pkl")
+        model = joblib.load(r"model.pkl")
         col1, col2 = st.columns(2)
         col1.metric("Score entraînement", f"{model.score(X_train_enc, y_train):.2f}")
         col2.metric("Score test", f"{model.score(X_test_enc, y_test):.2f}")
@@ -609,7 +610,7 @@ if page == pages[2] :
         st.pyplot(fig)
   #Décision Tree Regressor
     with st.expander("🌳 Decision Tree Regressor", expanded=False):
-        model_tree = joblib.load(r"C:\Users\d58671\Documents\Supports de formation\Formation Data_analyst\Projet données terrestres\model_tree.pkl")
+        model_tree = joblib.load(r"model_tree.pkl")
         col1, col2 = st.columns(2)
         col1.metric("Score entraînement", f"{model_tree.score(X_train_enc, y_train):.2f}")
         col2.metric("Score test", f"{model_tree.score(X_test_enc, y_test):.2f}")
@@ -625,7 +626,7 @@ if page == pages[2] :
         st.pyplot(fig)
   #Random Forest Regressor
     with st.expander("🌲 Random Forest Regressor", expanded=False):
-        rfr = joblib.load(r"C:\Users\d58671\Documents\Supports de formation\Formation Data_analyst\Projet données terrestres\rfr.pkl")
+        rfr = joblib.load(r"rfr.pkl")
         col1, col2 = st.columns(2)
         col1.metric("Score entraînement", f"{rfr.score(X_train_enc, y_train):.2f}")
         col2.metric("Score test", f"{rfr.score(X_test_enc, y_test):.2f}")
@@ -670,7 +671,7 @@ if page == pages[2] :
         df = pd.DataFrame(data, index = ['Régression linéaire', 'Decision Tree', 'Random Forest '])
         st.dataframe(df.head())
     with st.expander("BONUS 🌲 Random Forest Regressor avec normalisation des données", expanded=False):    
-       clf = joblib.load(r"C:\Users\d58671\Documents\Supports de formation\Formation Data_analyst\Projet données terrestres\clf.pkl")
+       clf = joblib.load(r"clf.pkl")
        y_pred_random_forest = clf.predict(X_test)
        mae_random_forest_test = mean_absolute_error(y_test,y_pred_random_forest)
        mse_random_forest_test = mean_squared_error(y_test, y_pred_random_forest)
@@ -692,7 +693,7 @@ if page == pages[2] :
     df_world= owid[owid['country']=='World']
     df_arima =df_world[['year','temperature_change_from_ghg']]
     y = df_arima['temperature_change_from_ghg']
-    model_fit = joblib.load(r"C:\Users\d58671\Documents\Supports de formation\Formation Data_analyst\Projet données terrestres\model_arima.pkl")
+    model_fit = joblib.load(r"model_arima.pkl")
     years_future = np.arange(2024, 2101)
     forecast = model_fit.forecast(steps=len(years_future))
     fig, ax = plt.subplots(figsize=(10, 5))
